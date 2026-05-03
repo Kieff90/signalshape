@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signalshape.dev/schemas/debug.schema.json",
+  "title": "SignalShape Debug",
+  "description": "Failure report with a routable next_action for orchestrator branching.",
+  "allOf": [{ "$ref": "envelope.schema.json" }],
+  "unevaluatedProperties": false,
+  "properties": {
+    "shape": { "const": "debug" },
+    "payload": {
+      "type": "object",
+      "required": ["hypothesis", "next_action"],
+      "additionalProperties": false,
+      "properties": {
+        "hypothesis": { "type": "string", "minLength": 1 },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["command", "expected"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "type": "string", "minLength": 1 },
+              "expected": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "next_action": {
+          "type": "string",
+          "enum": ["retry", "escalate", "abort", "investigate"]
+        },
+        "context": {
+          "type": "object",
+          "description": "Free-form. Extension point — additionalProperties open."
+        }
+      }
+    }
+  }
+}

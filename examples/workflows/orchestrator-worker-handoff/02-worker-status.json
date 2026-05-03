@@ -1,0 +1,19 @@
+{
+  "shape": "status",
+  "version": "0.1.0",
+  "producer": "implementation-worker",
+  "consumer_hint": "orchestrator",
+  "confidence": "medium",
+  "payload": {
+    "done": [
+      "read CONTEXT.md and PLAN.md",
+      "located auth/session.ts and identified expiry boundary"
+    ],
+    "current": "writing fix for off-by-one in token expiry check",
+    "next": [
+      "add boundary test for exact-expiry token",
+      "run full auth integration suite"
+    ],
+    "blocked_by": null
+  }
+}

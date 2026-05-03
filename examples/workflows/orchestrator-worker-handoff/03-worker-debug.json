@@ -1,0 +1,28 @@
+{
+  "shape": "debug",
+  "version": "0.1.0",
+  "producer": "implementation-worker",
+  "consumer_hint": "orchestrator",
+  "confidence": "low",
+  "requires_human": true,
+  "payload": {
+    "hypothesis": "the failing migration depends on a column that does not exist in any committed migration file; possible squashed migration drift",
+    "checks": [
+      {
+        "command": "grep -rn 'users.legacy_role' migrations/",
+        "expected": "find the migration that adds users.legacy_role"
+      },
+      {
+        "command": "psql -c '\\d users' on staging",
+        "expected": "confirm whether legacy_role exists in staging schema"
+      }
+    ],
+    "next_action": "escalate",
+    "context": {
+      "error_excerpt": "ERROR: column \"legacy_role\" does not exist",
+      "migration_file": "20240412_add_legacy_role_index.sql",
+      "schema_history_inspected": true,
+      "attempt": 2
+    }
+  }
+}

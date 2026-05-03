@@ -1,0 +1,46 @@
+{
+  "shape": "handoff",
+  "version": "0.1.0",
+  "producer": "implementation-worker",
+  "consumer_hint": "verifier",
+  "confidence": "high",
+  "payload": {
+    "goal": "verify the auth refactor passes integration tests and does not regress existing session behavior",
+    "state": {
+      "branch": "feat/auth-refactor",
+      "commits_ahead": 4,
+      "tests_run_locally": ["auth.unit", "auth.integration"]
+    },
+    "decisions": [
+      {
+        "what": "rotating refresh tokens with 7-day TTL",
+        "why": "session table was a write bottleneck under load"
+      },
+      {
+        "what": "feature flag gates the new flow",
+        "why": "allows 24h dual-stack window for existing sessions to drain"
+      }
+    ],
+    "files_touched": [
+      { "path": "src/auth/session.ts", "change": "modified" },
+      { "path": "src/auth/jwt.ts", "change": "created" },
+      { "path": "src/auth/refresh.ts", "change": "created" },
+      { "path": "tests/auth/expiry.test.ts", "change": "modified" }
+    ],
+    "next": [
+      { "action": "run integration tests in apps/api", "owner": "verifier" },
+      { "action": "verify feature flag behavior with both states", "owner": "verifier" },
+      { "action": "spot-check log output for token rotation events", "owner": "verifier" }
+    ],
+    "risks": [
+      {
+        "risk": "existing sessions invalidated on deploy if flag disabled prematurely",
+        "mitigation": "keep flag enabled for full 24h window; document in runbook"
+      },
+      {
+        "risk": "JWT secret rotation requires coordinated deploy across services",
+        "mitigation": "secret rotation runbook in docs/runbooks/auth-secret-rotation.md"
+      }
+    ]
+  }
+}

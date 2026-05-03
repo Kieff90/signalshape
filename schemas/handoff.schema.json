@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signalshape.dev/schemas/handoff.schema.json",
+  "title": "SignalShape Handoff",
+  "description": "Ownership transfer from one agent to another. Use when producer disconnects.",
+  "allOf": [{ "$ref": "envelope.schema.json" }],
+  "unevaluatedProperties": false,
+  "properties": {
+    "shape": { "const": "handoff" },
+    "payload": {
+      "type": "object",
+      "required": ["goal"],
+      "additionalProperties": false,
+      "properties": {
+        "goal": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the next agent should accomplish."
+        },
+        "state": {
+          "type": "object",
+          "description": "Free-form context. Extension point — additionalProperties open."
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["what", "why"],
+            "additionalProperties": false,
+            "properties": {
+              "what": { "type": "string", "minLength": 1 },
+              "why": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "files_touched": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "change"],
+            "additionalProperties": false,
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "change": { "type": "string", "enum": ["modified", "created", "deleted"] }
+            }
+          }
+        },
+        "next": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["action"],
+            "additionalProperties": false,
+            "properties": {
+              "action": { "type": "string", "minLength": 1 },
+              "owner": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["risk"],
+            "additionalProperties": false,
+            "properties": {
+              "risk": { "type": "string", "minLength": 1 },
+              "mitigation": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

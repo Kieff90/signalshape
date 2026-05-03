@@ -1,0 +1,22 @@
+{
+  "shape": "decision",
+  "version": "0.1.0",
+  "producer": "orchestrator",
+  "consumer_hint": "worker",
+  "confidence": "high",
+  "payload": {
+    "recommendation": "spawn implementation-worker",
+    "reason": "task spec is locked and CONTEXT.md has no open questions; ready to write code",
+    "options_considered": [
+      {
+        "option": "spawn research-worker",
+        "tradeoff": "would re-research already-decided context"
+      },
+      {
+        "option": "ask human for clarification",
+        "tradeoff": "no actual ambiguity in spec"
+      }
+    ],
+    "when_to_choose_other": null
+  }
+}

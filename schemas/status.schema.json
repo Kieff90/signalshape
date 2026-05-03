@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signalshape.dev/schemas/status.schema.json",
+  "title": "SignalShape Status",
+  "description": "In-flight progress update. Producer keeps ownership.",
+  "allOf": [{ "$ref": "envelope.schema.json" }],
+  "unevaluatedProperties": false,
+  "properties": {
+    "shape": { "const": "status" },
+    "payload": {
+      "type": "object",
+      "required": ["done", "current", "next"],
+      "additionalProperties": false,
+      "properties": {
+        "done": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "current": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "blocked_by": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  }
+}

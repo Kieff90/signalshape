@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signalshape.dev/schemas/decision.schema.json",
+  "title": "SignalShape Decision",
+  "description": "Routing or strategic choice between options.",
+  "allOf": [{ "$ref": "envelope.schema.json" }],
+  "unevaluatedProperties": false,
+  "properties": {
+    "shape": { "const": "decision" },
+    "payload": {
+      "type": "object",
+      "required": ["recommendation", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "recommendation": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "options_considered": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["option", "tradeoff"],
+            "additionalProperties": false,
+            "properties": {
+              "option": { "type": "string", "minLength": 1 },
+              "tradeoff": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "when_to_choose_other": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  }
+}

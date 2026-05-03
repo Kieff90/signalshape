@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signalshape.dev/schemas/envelope.schema.json",
+  "title": "SignalShape Envelope",
+  "description": "Outer wrapper for every SignalShape message. Identifies shape, contract version, and producer.",
+  "type": "object",
+  "required": ["shape", "version", "producer", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "shape": {
+      "type": "string",
+      "enum": [
+        "handoff",
+        "status",
+        "decision",
+        "debug",
+        "review",
+        "implement",
+        "explain",
+        "writing"
+      ],
+      "description": "Message shape. Only handoff/status/decision/debug are machine-validatable in v0.1."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "SignalShape contract version (semver). v0.1 uses 0.1.0."
+    },
+    "producer": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Agent identifier. Kebab-case ASCII for routing/logging."
+    },
+    "consumer_hint": {
+      "type": "string",
+      "enum": ["orchestrator", "worker", "verifier", "human"],
+      "description": "Hint about expected consumer. Not enforced."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Producer self-assessed confidence. Discrete buckets, not floats."
+    },
+    "requires_human": {
+      "type": "boolean",
+      "description": "If true, asks for human input. If omitted, consumers MUST interpret as false."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Shape-specific content. See per-shape spec."
+    }
+  }
+}

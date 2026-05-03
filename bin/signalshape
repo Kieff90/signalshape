@@ -1,0 +1,241 @@
+#!/usr/bin/env node
+// SignalShape CLI v0.1
+//
+// Validates SignalShape messages against their schemas.
+// Exit codes:
+//   0 = valid
+//   1 = invalid (validation failed)
+//   2 = malformed JSON
+//   3 = unknown shape
+//   4 = recognized but not machine-validatable in this version
+//   64 = usage error
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const Ajv2020 = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
+
+const PKG = require(path.join(__dirname, '..', 'package.json'));
+const SCHEMAS_DIR = path.join(__dirname, '..', 'schemas');
+
+const VALIDATABLE_SHAPES = ['handoff', 'status', 'decision', 'debug'];
+const PROSE_SHAPES = ['review', 'implement', 'explain', 'writing'];
+const ALL_SHAPES = [...VALIDATABLE_SHAPES, ...PROSE_SHAPES];
+
+function loadSchema(name) {
+  const file = path.join(SCHEMAS_DIR, `${name}.schema.json`);
+  return JSON.parse(fs.readFileSync(file, 'utf8'));
+}
+
+function buildAjv() {
+  const ajv = new Ajv2020({
+    strict: false,
+    allErrors: true,
+    allowUnionTypes: true
+  });
+  addFormats(ajv);
+  // Register envelope first so $ref resolves.
+  ajv.addSchema(loadSchema('envelope'), 'envelope.schema.json');
+  for (const shape of VALIDATABLE_SHAPES) {
+    ajv.addSchema(loadSchema(shape), `${shape}.schema.json`);
+  }
+  return ajv;
+}
+
+function readInput(arg) {
+  if (arg === '-') {
+    return fs.readFileSync(0, 'utf8'); // stdin
+  }
+  return fs.readFileSync(arg, 'utf8');
+}
+
+function formatErrors(errors) {
+  return errors
+    .map((e) => {
+      const where = e.instancePath || '/';
+      return `  ${where} ${e.message}` + (e.params ? ` (${JSON.stringify(e.params)})` : '');
+    })
+    .join('\n');
+}
+
+function lintOne(filepath, opts) {
+  const label = filepath === '-' ? '<stdin>' : filepath;
+  let raw;
+  try {
+    raw = readInput(filepath);
+  } catch (err) {
+    process.stderr.write(`${label}: cannot read file (${err.message})\n`);
+    return 64;
+  }
+
+  let doc;
+  try {
+    doc = JSON.parse(raw);
+  } catch (err) {
+    process.stderr.write(`${label}: malformed JSON (${err.message})\n`);
+    return 2;
+  }
+
+  const declaredShape = doc && doc.shape;
+
+  if (opts.requiredShape && declaredShape !== opts.requiredShape) {
+    process.stderr.write(
+      `${label}: --shape ${opts.requiredShape} requires envelope.shape === "${opts.requiredShape}", got "${declaredShape || '(missing)'}"\n`
+    );
+    return 1;
+  }
+
+  if (typeof declaredShape === 'string' && !ALL_SHAPES.includes(declaredShape)) {
+    process.stderr.write(
+      `${label}: unknown shape "${declaredShape}". Known: ${ALL_SHAPES.join(', ')}\n`
+    );
+    return 3;
+  }
+
+  const ajv = opts.ajv;
+  const envelopeValidate = ajv.getSchema('envelope.schema.json');
+  if (!envelopeValidate) {
+    process.stderr.write(`${label}: internal error — no envelope schema\n`);
+    return 64;
+  }
+
+  const envelopeOk = envelopeValidate(doc);
+  if (!envelopeOk) {
+    process.stderr.write(`${label}: invalid envelope\n${formatErrors(envelopeValidate.errors)}\n`);
+    return 1;
+  }
+
+  if (PROSE_SHAPES.includes(declaredShape)) {
+    if (opts.allowProseShapes) {
+      process.stdout.write(`${label}: shape "${declaredShape}" recognized but not machine-validatable in v0.1 (allowed)\n`);
+      return 0;
+    }
+    process.stderr.write(
+      `${label}: shape "${declaredShape}" is recognized but not machine-validatable in v0.1. Use --allow-prose-shapes to exit 0.\n`
+    );
+    return 4;
+  }
+
+  const validate = ajv.getSchema(`${declaredShape}.schema.json`);
+  if (!validate) {
+    process.stderr.write(`${label}: internal error — no schema for "${declaredShape}"\n`);
+    return 64;
+  }
+
+  const ok = validate(doc);
+  if (!ok) {
+    process.stderr.write(`${label}: invalid (${declaredShape})\n${formatErrors(validate.errors)}\n`);
+    return 1;
+  }
+
+  process.stdout.write(`${label}: valid (${declaredShape})\n`);
+  return 0;
+}
+
+function printHelp() {
+  process.stdout.write(`signalshape v${PKG.version}
+
+Usage:
+  signalshape lint [--shape <name>] [--allow-prose-shapes] <file|-> [...]
+  signalshape --version
+  signalshape --help
+
+Commands:
+  lint <file...>          Validate one or more files (use - for stdin).
+                          Multiple files: highest exit code wins.
+
+Flags (lint):
+  --shape <name>          Require envelope.shape to equal <name>. Does NOT bypass
+                          envelope validation. Mismatch = exit 1.
+  --allow-prose-shapes    For shapes recognized but not machine-validatable
+                          in v0.1 (review/implement/explain/writing), exit 0
+                          instead of 4.
+
+Exit codes:
+  0  valid
+  1  invalid (validation failed)
+  2  malformed JSON
+  3  unknown shape
+  4  recognized but not machine-validatable in this version
+  64 usage error
+`);
+}
+
+function parseArgs(argv) {
+  const args = argv.slice(2);
+
+  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
+    return { command: 'help' };
+  }
+  if (args.includes('--version') || args.includes('-v')) {
+    return { command: 'version' };
+  }
+
+  if (args[0] !== 'lint') {
+    return { command: 'error', message: `unknown command: "${args[0]}"` };
+  }
+
+  const lintArgs = args.slice(1);
+  const opts = { requiredShape: null, allowProseShapes: false, files: [] };
+
+  for (let i = 0; i < lintArgs.length; i++) {
+    const a = lintArgs[i];
+    if (a === '--shape') {
+      const next = lintArgs[i + 1];
+      if (!next) return { command: 'error', message: '--shape requires a value' };
+      if (!ALL_SHAPES.includes(next)) {
+        return { command: 'error', message: `--shape value must be one of: ${ALL_SHAPES.join(', ')}` };
+      }
+      opts.requiredShape = next;
+      i++;
+    } else if (a === '--allow-prose-shapes') {
+      opts.allowProseShapes = true;
+    } else if (a.startsWith('--')) {
+      return { command: 'error', message: `unknown flag: ${a}` };
+    } else {
+      opts.files.push(a);
+    }
+  }
+
+  if (opts.files.length === 0) {
+    return { command: 'error', message: 'lint requires at least one file (use - for stdin)' };
+  }
+
+  return { command: 'lint', opts };
+}
+
+function main() {
+  const parsed = parseArgs(process.argv);
+
+  switch (parsed.command) {
+    case 'help':
+      printHelp();
+      process.exit(0);
+    case 'version':
+      process.stdout.write(`${PKG.version}\n`);
+      process.exit(0);
+    case 'error':
+      process.stderr.write(`signalshape: ${parsed.message}\n\n`);
+      printHelp();
+      process.exit(64);
+    case 'lint': {
+      const ajv = buildAjv();
+      const opts = { ...parsed.opts, ajv };
+      let worst = 0;
+      for (const file of opts.files) {
+        const code = lintOne(file, opts);
+        if (code > worst) worst = code;
+      }
+      process.exit(worst);
+    }
+  }
+}
+
+try {
+  main();
+} catch (err) {
+  process.stderr.write(`signalshape: internal error — ${err.stack || err.message}\n`);
+  process.exit(64);
+}
