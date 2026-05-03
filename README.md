@@ -44,6 +44,43 @@ headline — they are a side effect of the contract being well-shaped.
 
 ---
 
+## How you can use it
+
+SignalShape can be used at three levels. They are related, but not the same thing.
+
+### 1. As a manual skill
+
+Install [`skills/signalshape/SKILL.md`](skills/signalshape/SKILL.md) into Claude Code or Codex, then ask the agent to use SignalShape.
+
+Use this when you want one agent to answer with the right shape: JSON when another agent may consume the output, prose when the answer is for a human.
+
+### 2. As project instructions
+
+Paste [`prompts/repo-instructions.md`](prompts/repo-instructions.md) into `AGENTS.md`, `CLAUDE.md`, or another repo-level instruction file.
+
+Use this when you want agents working inside a repository to follow SignalShape automatically without manually invoking a skill every time.
+
+### 3. As an agent contract
+
+Use the schemas in [`schemas/`](schemas) and validate messages with:
+
+```sh
+./bin/signalshape lint output.json
+```
+
+Use this when one agent's output becomes another agent's input. This is the core v0.1 use case.
+
+The shortest version:
+
+| Use case | File or tool | What it gives you |
+|---|---|---|
+| Human manually invokes it | `skills/signalshape/SKILL.md` | Better-shaped replies and JSON handoffs on request |
+| Repo-level default behavior | `prompts/repo-instructions.md` | Persistent instructions for Codex, Claude Code, or similar agents |
+| Agent-to-agent workflow | `schemas/` + `bin/signalshape` | Machine-validatable messages |
+| Slash command / custom command | `commands/signalshape.md` | A reusable one-shot prompt |
+
+---
+
 ## Quick start
 
 ```sh
@@ -152,7 +189,7 @@ cp -R skills/signalshape ~/.agents/skills/signalshape
 
 ### Generic agents
 
-Use the prompt files in [`prompts/`](prompts) or the slash command in [`commands/`](commands).
+Use the prompt files in [`prompts/`](prompts) or the slash command in [`commands/`](commands). For repo-level automation, paste [`prompts/repo-instructions.md`](prompts/repo-instructions.md) into `AGENTS.md`, `CLAUDE.md`, or your agent framework's equivalent instruction file.
 
 ---
 
