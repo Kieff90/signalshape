@@ -1,6 +1,6 @@
 {
   "name": "signalshape",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lightweight communication contract for AI agents.",
   "bin": {
     "signalshape": "bin/signalshape"

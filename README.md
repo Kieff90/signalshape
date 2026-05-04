@@ -7,6 +7,9 @@ can validate, consume, and hand off**. v0.1 ships four machine-validatable
 shapes — Handoff, Status, Decision, Debug — plus a CLI validator and a worked
 multi-agent demo.
 
+SignalShape makes agent outputs testable: key messages can be validated with
+deterministic checks instead of judged only by humans or LLMs.
+
 [![ci](https://github.com/Kieff90/signalshape/actions/workflows/ci.yml/badge.svg)](https://github.com/Kieff90/signalshape/actions/workflows/ci.yml)
 
 ---
@@ -27,6 +30,7 @@ prose.
 | 8 prose response shapes | 4 JSON-validatable shapes + 4 prose-only shapes |
 | Markdown doctrine | Spec + JSON schemas + CLI validator |
 | "Make the agent talk better" | "Make agent outputs consumable by other agents" |
+| "Looks structured" | Deterministic checks with `signalshape lint` |
 
 The token-saving and anti-slop benefits are still there. They are no longer the
 headline — they are a side effect of the contract being well-shaped.
@@ -69,6 +73,9 @@ Use the schemas in [`schemas/`](schemas) and validate messages with:
 ```
 
 Use this when one agent's output becomes another agent's input. This is the core v0.1 use case.
+
+It also gives you a deterministic evaluation target: CI, workflow engines, or
+orchestrators can fail malformed messages before another agent consumes them.
 
 The shortest version:
 
@@ -126,7 +133,7 @@ The honest answer:
 | `humanizer` | Strips AI tells from prose | No machine contract |
 | `caveman` | Compresses tokens | No structure for downstream agents |
 | Generic structured prompting | One-off prompt schemas per task | No shared contract across agents |
-| **SignalShape v0.1** | Versioned contract with validator + envelope across 4 shapes | Not a transport, not an SDK, not a full multi-agent protocol |
+| **SignalShape v0.1** | Versioned contract with validator + deterministic checks across 4 shapes | Not a transport, not an SDK, not a full multi-agent protocol |
 
 If your agent only talks to humans, those tools probably cover you.
 If your agent's output is **consumed by another agent**, SignalShape gives you
