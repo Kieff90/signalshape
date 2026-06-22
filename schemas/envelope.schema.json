@@ -23,8 +23,8 @@
     },
     "version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "SignalShape contract version (semver). v0.1 uses 0.1.0."
+      "const": "0.1.0",
+      "description": "SignalShape contract version. v0.1 accepts 0.1.0."
     },
     "producer": {
       "type": "string",

@@ -1,0 +1,9 @@
+.claude/
+.github/
+.DS_Store
+.env
+.env.*
+docs/
+node_modules/
+SIGNALSHAPE-LOG.md
+*.tgz

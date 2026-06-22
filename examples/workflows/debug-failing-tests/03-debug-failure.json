@@ -1,0 +1,29 @@
+{
+  "shape": "debug",
+  "version": "0.1.0",
+  "producer": "debug-agent",
+  "consumer_hint": "worker",
+  "confidence": "high",
+  "payload": {
+    "hypothesis": "math.js add() uses subtraction operator instead of addition on line 4 — `return a - b` produces wrong results for all cases where a != b, causing 2 of 3 assertions to fail",
+    "checks": [
+      {
+        "command": "node --test examples/workflows/debug-failing-tests/app/math.test.js",
+        "expected": "3 pass, 0 fail after changing `return a - b` to `return a + b` on line 4 of math.js"
+      }
+    ],
+    "next_action": "retry",
+    "context": {
+      "file": "examples/workflows/debug-failing-tests/app/math.js",
+      "line": 4,
+      "found": "return a - b",
+      "expected_fix": "return a + b",
+      "failing_assertions": [
+        "add(2, 3): got -1, expected 5",
+        "add(-1, 1): got -2, expected 0"
+      ],
+      "passing_assertion": "add(0, 0): got 0, expected 0 — passes incidentally because 0 - 0 === 0 + 0",
+      "note": "The zero case masks the bug by coincidence; the fix must change the operator, not special-case zero"
+    }
+  }
+}

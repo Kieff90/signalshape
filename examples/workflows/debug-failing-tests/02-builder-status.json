@@ -1,0 +1,19 @@
+{
+  "shape": "status",
+  "version": "0.1.0",
+  "producer": "builder",
+  "consumer_hint": "worker",
+  "confidence": "high",
+  "payload": {
+    "done": [
+      "created app/math.js with intentional subtraction bug (a - b instead of a + b)",
+      "created app/math.test.js with three assertions covering positive, zero, and negative inputs",
+      "executed node --test to confirm real failure output"
+    ],
+    "current": "test run complete — 2 of 3 tests failing as expected",
+    "next": [
+      "pass test failure details to debug-agent via 03-debug-failure.json"
+    ],
+    "blocked_by": "test failure: add(2, 3) returned -1 (expected 5) and add(-1, 1) returned -2 (expected 0) — math.js line 4 returns a - b instead of a + b"
+  }
+}

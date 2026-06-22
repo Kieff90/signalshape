@@ -13,7 +13,7 @@ Every machine-validatable shape (Handoff, Status, Decision, Debug) inlines this 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `shape` | enum string | yes | One of: `handoff`, `status`, `decision`, `debug`, `review`, `implement`, `explain`, `writing` |
-| `version` | string (semver) | yes | SignalShape contract version. v0.1 = `"0.1.0"` |
+| `version` | string literal | yes | SignalShape contract version. v0.1 accepts only `"0.1.0"` |
 | `producer` | string | yes | `^[a-z][a-z0-9-]*$`, length 1–80 |
 | `consumer_hint` | enum string | no | One of: `orchestrator`, `worker`, `verifier`, `human` |
 | `confidence` | enum string | no | One of: `high`, `medium`, `low` |
@@ -37,6 +37,8 @@ is not constrained in v0.1.
 
 `version` identifies the **SignalShape contract version** used by the producer.
 This is the contract version, **not** the version of an individual shape schema.
+The v0.1 validator accepts only `"0.1.0"` so consumers do not accidentally treat
+future incompatible contracts as valid v0.1 messages.
 
 > Shape schemas may evolve internally, but breaking validation semantics
 > require a contract version bump.

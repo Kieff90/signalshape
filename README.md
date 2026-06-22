@@ -54,13 +54,13 @@ SignalShape can be used at three levels. They are related, but not the same thin
 
 ### 1. As a manual skill
 
-Install [`skills/signalshape/SKILL.md`](skills/signalshape/SKILL.md) into Claude Code or Codex, then ask the agent to use SignalShape.
+Use [`skills/signalshape/SKILL.md`](skills/signalshape/SKILL.md) as an optional adapter for agents that support skills, or paste the prompts into any AI agent setup. Then ask the agent to use SignalShape.
 
 Use this when you want one agent to answer with the right shape: JSON when another agent may consume the output, prose when the answer is for a human.
 
 ### 2. As project instructions
 
-Paste [`prompts/repo-instructions.md`](prompts/repo-instructions.md) into `AGENTS.md`, `CLAUDE.md`, or another repo-level instruction file.
+Paste [`prompts/repo-instructions.md`](prompts/repo-instructions.md) into `AGENTS.md`, `CLAUDE.md`, or any repo-level instruction file your agent runner reads.
 
 Use this when you want agents working inside a repository to follow SignalShape automatically without manually invoking a skill every time.
 
@@ -82,7 +82,7 @@ The shortest version:
 | Use case | File or tool | What it gives you |
 |---|---|---|
 | Human manually invokes it | `skills/signalshape/SKILL.md` | Better-shaped replies and JSON handoffs on request |
-| Repo-level default behavior | `prompts/repo-instructions.md` | Persistent instructions for Codex, Claude Code, or similar agents |
+| Repo-level default behavior | `prompts/repo-instructions.md` | Persistent instructions for any AI agent that reads repo-level guidance |
 | Agent-to-agent workflow | `schemas/` + `bin/signalshape` | Machine-validatable messages |
 | Slash command / custom command | `commands/signalshape.md` | A reusable one-shot prompt |
 
@@ -168,7 +168,11 @@ have data on how teams use them.
 
 ## Install as a skill
 
-### Claude Code
+SignalShape is framework-agnostic. The install script only copies the optional
+skill into known local skill directories; the schemas and CLI work with any
+agent pipeline that can emit JSON.
+
+### Claude-compatible agents
 
 ```sh
 ./scripts/install.sh claude
@@ -181,7 +185,7 @@ mkdir -p ~/.claude/skills
 cp -R skills/signalshape ~/.claude/skills/signalshape
 ```
 
-### Codex
+### Codex-compatible agents
 
 ```sh
 ./scripts/install.sh codex
@@ -194,9 +198,12 @@ mkdir -p ~/.agents/skills
 cp -R skills/signalshape ~/.agents/skills/signalshape
 ```
 
-### Generic agents
+### Any AI agent
 
-Use the prompt files in [`prompts/`](prompts) or the slash command in [`commands/`](commands). For repo-level automation, paste [`prompts/repo-instructions.md`](prompts/repo-instructions.md) into `AGENTS.md`, `CLAUDE.md`, or your agent framework's equivalent instruction file.
+Use the schema files directly, paste the prompt files in [`prompts/`](prompts),
+or adapt the slash command in [`commands/`](commands). For repo-level
+automation, paste [`prompts/repo-instructions.md`](prompts/repo-instructions.md)
+into whatever instruction file your agent framework reads.
 
 ---
 
@@ -239,7 +246,7 @@ Default is **strict**. CI workflows will fail on code 4 unless you opt in to
 
 - Schemas for `review` and `implement` (require domain modeling)
 - npm package distribution
-- Hooks for Claude Code so the harness enforces shape, not the agent's memory
+- Hooks or adapters for popular agent runners so the harness enforces shape, not the agent's memory
 - A2A / MCP compatibility analysis
 - Numeric `confidence` (only after we have data on how it's actually used)
 - `correlation_id` for multi-agent tracing

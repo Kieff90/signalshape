@@ -1,0 +1,26 @@
+{
+  "shape": "decision",
+  "version": "0.1.0",
+  "producer": "planner",
+  "consumer_hint": "worker",
+  "confidence": "high",
+  "payload": {
+    "recommendation": "spawn builder-agent to create math.js with intentional subtraction bug and a failing test",
+    "reason": "This workflow demonstrates SignalShape as a real inter-agent contract: a builder-agent emits a status after producing the buggy code, a debug-agent consumes the failing test output and emits a debug shape with the diagnosed root cause, and a fixer-agent consumes that debug message to apply the patch. Each handoff is a schema-validated JSON envelope rather than free-form prose, so the chain is machine-verifiable end-to-end. Seeding the repo with a known arithmetic bug (a - b instead of a + b) gives a deterministic failure that any downstream agent can reproduce, making the contract observable rather than hypothetical.",
+    "options_considered": [
+      {
+        "option": "ship math.js already correct and only simulate a debug exchange",
+        "tradeoff": "no real failing test, so the debug and fix shapes would carry fabricated payloads instead of evidence-backed ones"
+      },
+      {
+        "option": "use a heavy test runner like Jest or Vitest",
+        "tradeoff": "adds dependencies and install steps; node:test is built in and keeps the example reproducible with zero install"
+      },
+      {
+        "option": "introduce a more complex bug (e.g. floating point, async)",
+        "tradeoff": "obscures the contract demo behind domain complexity; a trivial off-by-operator bug keeps focus on the agent handoffs"
+      }
+    ],
+    "when_to_choose_other": null
+  }
+}

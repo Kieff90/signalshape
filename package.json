@@ -5,8 +5,23 @@
   "bin": {
     "signalshape": "bin/signalshape"
   },
+  "files": [
+    "bin/",
+    "commands/",
+    "core/",
+    "examples/",
+    "prompts/",
+    "schemas/",
+    "scripts/",
+    "skills/",
+    "spec/",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
   "scripts": {
     "lint:demo": "./examples/workflows/orchestrator-worker-handoff/run-demo.sh",
+    "lint:demo:debug": "./examples/workflows/debug-failing-tests/run-demo.sh",
     "test": "node test/run.js"
   },
   "engines": {
@@ -24,8 +39,7 @@
   "keywords": [
     "agents",
     "ai",
-    "claude",
-    "codex",
+    "agent-framework",
     "communication-contract",
     "json-schema",
     "multi-agent",

@@ -1,0 +1,125 @@
+{
+  "shape": "handoff",
+  "version": "0.1.0",
+  "producer": "verifier",
+  "consumer_hint": "human",
+  "confidence": "high",
+  "requires_human": false,
+  "payload": {
+    "goal": "Review the bug fix and all four SignalShape contract files, then commit the changes and merge to main.",
+    "state": {
+      "workflow": "debug-failing-tests",
+      "outcome": "all tests pass",
+      "test_results": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "exit_code": 0
+      },
+      "test_cases": [
+        { "name": "add(2, 3) should equal 5", "status": "pass" },
+        { "name": "add(0, 0) should equal 0",  "status": "pass" },
+        { "name": "add(-1, 1) should equal 0", "status": "pass" }
+      ],
+      "root_cause": "math.js line 4 used the subtraction operator (`a - b`) instead of addition (`a + b`), causing correct output only for the degenerate case where both operands are zero.",
+      "fix_applied": "Changed `return a - b` to `return a + b` in examples/workflows/debug-failing-tests/app/math.js",
+      "agents_in_chain": ["planner", "builder", "debug-agent", "fixer", "verifier"]
+    },
+    "decisions": [
+      {
+        "what": "Write the test suite before touching the implementation",
+        "why": "TDD surfaces the exact assertion failures that pinpoint the wrong operator; without tests the bug could remain hidden indefinitely"
+      },
+      {
+        "what": "Fix the operator in math.js rather than patching individual test cases",
+        "why": "The tests described correct behaviour; the implementation was wrong — adjusting tests would invert the semantics of the module"
+      },
+      {
+        "what": "Keep the zero-case test (add(0, 0) === 0) even though it passes with either operator",
+        "why": "It documents a boundary value and would catch a future regression to a multiply or other operator; removing it reduces coverage without benefit"
+      },
+      {
+        "what": "Emit a SignalShape contract at every agent boundary (planner, builder, debug-agent, fixer, verifier)",
+        "why": "Structured envelopes make the reasoning of each agent machine-readable and auditable, demonstrating the core SignalShape value proposition"
+      }
+    ],
+    "files_touched": [
+      {
+        "path": "examples/workflows/debug-failing-tests/app/math.js",
+        "change": "modified"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/app/math.test.js",
+        "change": "created"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/01-planner-decision.json",
+        "change": "created"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/02-builder-status.json",
+        "change": "created"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/03-debug-failure.json",
+        "change": "created"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/04-final-handoff.json",
+        "change": "created"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/README.md",
+        "change": "created"
+      },
+      {
+        "path": "examples/workflows/debug-failing-tests/run-demo.sh",
+        "change": "created"
+      },
+      {
+        "path": "package.json",
+        "change": "modified"
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "change": "modified"
+      }
+    ],
+    "next": [
+      {
+        "action": "Review math.js and math.test.js to confirm the fix and test coverage are acceptable",
+        "owner": "human"
+      },
+      {
+        "action": "Read the four SignalShape contract files (01 through 04) as a complete narrative of the agent workflow",
+        "owner": "human"
+      },
+      {
+        "action": "Stage and commit all changes under `examples/workflows/debug-failing-tests/` with a descriptive message referencing the bug fix and the SignalShape demo",
+        "owner": "human"
+      },
+      {
+        "action": "Merge the branch to main (or open a pull request) so the workflow example is available to other contributors",
+        "owner": "human"
+      },
+      {
+        "action": "Consider extending the workflow with additional edge-case tests (non-integer inputs, very large numbers, NaN) to raise coverage above 90%",
+        "owner": "human"
+      }
+    ],
+    "risks": [
+      {
+        "risk": "run-demo.sh temporarily mutates math.js in place to replay the bug; an interrupt between revert and restore leaves the working tree in the buggy state",
+        "mitigation": "run-demo.sh uses a bash trap to guarantee restore on exit or SIGINT; verified safe"
+      },
+      {
+        "risk": "The test suite covers only integer inputs; floating-point or non-numeric arguments are untested",
+        "mitigation": "Add tests for add(1.5, 2.5), add(NaN, 1), and add('a', 'b') to harden the contract before shipping"
+      },
+      {
+        "risk": "This workflow is a demo with a deliberately simple bug; real workflows may have multi-file root causes that a single debug-agent pass cannot fully diagnose",
+        "mitigation": "SignalShape supports chaining multiple debug contracts; document this pattern in the workflow README for teams adopting it on production codebases"
+      }
+    ]
+  }
+}

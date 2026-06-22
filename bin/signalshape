@@ -23,6 +23,7 @@ const SCHEMAS_DIR = path.join(__dirname, '..', 'schemas');
 const VALIDATABLE_SHAPES = ['handoff', 'status', 'decision', 'debug'];
 const PROSE_SHAPES = ['review', 'implement', 'explain', 'writing'];
 const ALL_SHAPES = [...VALIDATABLE_SHAPES, ...PROSE_SHAPES];
+const MAX_INPUT_BYTES = 1024 * 1024;
 
 function loadSchema(name) {
   const file = path.join(SCHEMAS_DIR, `${name}.schema.json`);
@@ -46,7 +47,26 @@ function buildAjv() {
 
 function readInput(arg) {
   if (arg === '-') {
-    return fs.readFileSync(0, 'utf8'); // stdin
+    const chunks = [];
+    let total = 0;
+    const buffer = Buffer.alloc(64 * 1024);
+    let bytesRead;
+    while ((bytesRead = fs.readSync(0, buffer, 0, buffer.length, null)) > 0) {
+      total += bytesRead;
+      if (total > MAX_INPUT_BYTES) {
+        const err = new Error(`input exceeds ${MAX_INPUT_BYTES} bytes`);
+        err.code = 'SIGNALSHAPE_INPUT_TOO_LARGE';
+        throw err;
+      }
+      chunks.push(Buffer.from(buffer.subarray(0, bytesRead)));
+    }
+    return Buffer.concat(chunks).toString('utf8');
+  }
+  const stat = fs.statSync(arg);
+  if (stat.size > MAX_INPUT_BYTES) {
+    const err = new Error(`input exceeds ${MAX_INPUT_BYTES} bytes`);
+    err.code = 'SIGNALSHAPE_INPUT_TOO_LARGE';
+    throw err;
   }
   return fs.readFileSync(arg, 'utf8');
 }
@@ -66,6 +86,10 @@ function lintOne(filepath, opts) {
   try {
     raw = readInput(filepath);
   } catch (err) {
+    if (err.code === 'SIGNALSHAPE_INPUT_TOO_LARGE') {
+      process.stderr.write(`${label}: input too large (${err.message})\n`);
+      return 64;
+    }
     process.stderr.write(`${label}: cannot read file (${err.message})\n`);
     return 64;
   }
@@ -145,6 +169,7 @@ Usage:
 Commands:
   lint <file...>          Validate one or more files (use - for stdin).
                           Multiple files: highest exit code wins.
+                          Each input must be <= 1 MiB.
 
 Flags (lint):
   --shape <name>          Require envelope.shape to equal <name>. Does NOT bypass

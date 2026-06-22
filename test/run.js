@@ -30,8 +30,30 @@ function run(args) {
   });
 }
 
+function runWithInput(args, input) {
+  return spawnSync(CLI, args, {
+    cwd: ROOT,
+    encoding: 'utf8',
+    input
+  });
+}
+
 function expectExit(name, expected, args) {
   const result = run(args);
+  try {
+    assert.strictEqual(result.status, expected);
+    process.stdout.write(`ok ${name}\n`);
+  } catch (err) {
+    process.stderr.write(`not ok ${name}\n`);
+    process.stderr.write(`expected exit ${expected}, got ${result.status}\n`);
+    process.stderr.write(`stdout:\n${result.stdout}\n`);
+    process.stderr.write(`stderr:\n${result.stderr}\n`);
+    throw err;
+  }
+}
+
+function expectExitWithInput(name, expected, args, input) {
+  const result = runWithInput(args, input);
   try {
     assert.strictEqual(result.status, expected);
     process.stdout.write(`ok ${name}\n`);
@@ -98,6 +120,7 @@ expectExit('unknown shape', 3, ['lint', writeJson('unknown-shape.json', {
 })]);
 expectExit('prose shape without flag', 4, ['lint', writeJson('review.json', validReview)]);
 expectExit('prose shape with allow flag', 0, ['lint', '--allow-prose-shapes', writeJson('review-allowed.json', validReview)]);
+expectExitWithInput('stdin valid handoff', 0, ['lint', '-'], JSON.stringify(validHandoff));
 expectExit('prose shape still requires envelope', 1, ['lint', '--allow-prose-shapes', writeJson('review-bad-envelope.json', {
   shape: 'review'
 })]);
@@ -121,6 +144,10 @@ expectExit('version non-semver rejected', 1, ['lint', writeJson('version-bad.jso
   ...validHandoff,
   version: '0.1'
 })]);
+expectExit('future contract version rejected', 1, ['lint', writeJson('version-future.json', {
+  ...validHandoff,
+  version: '999.0.0'
+})]);
 expectExit('shape mismatch rejected', 1, ['lint', '--shape', 'status', writeJson('shape-mismatch.json', validHandoff)]);
 expectExit('debug next_action invalid', 1, ['lint', writeJson('debug-next-action-bad.json', {
   shape: 'debug',
@@ -136,5 +163,6 @@ expectExit('envelope extra field rejected', 1, ['lint', writeJson('extra-envelop
   correlation_id: 'abc'
 })]);
 expectExit('handoff state extension point allowed', 0, ['lint', writeJson('handoff-state-open.json', validHandoff)]);
+expectExit('oversized file rejected', 64, ['lint', writeText('oversized.json', ' '.repeat(1024 * 1024 + 1))]);
 
 fs.rmSync(TMP, { recursive: true, force: true });
