@@ -2,8 +2,7 @@
 
 ## Supported Versions
 
-SignalShape is pre-1.0. Security fixes are applied to the latest published
-version only.
+Security fixes are applied to the latest published version only.
 
 ## Reporting a Vulnerability
 

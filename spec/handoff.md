@@ -29,7 +29,7 @@ Use when one agent transfers ownership of a task to another agent (or future ses
 ```json
 {
   "shape": "handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementer",
   "payload": {
     "goal": "verify the auth refactor passes integration tests"
@@ -42,7 +42,7 @@ Use when one agent transfers ownership of a task to another agent (or future ses
 ```json
 {
   "shape": "handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementer",
   "consumer_hint": "verifier",
   "payload": {
@@ -70,7 +70,7 @@ Use when one agent transfers ownership of a task to another agent (or future ses
 ```json
 {
   "shape": "handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "researcher",
   "payload": {
     "goal": "draft architecture decision record",

@@ -68,7 +68,7 @@ function expectExitWithInput(name, expected, args, input) {
 
 const validHandoff = {
   shape: 'handoff',
-  version: '0.1.0',
+  version: '0.1.2',
   producer: 'worker-1',
   consumer_hint: 'verifier',
   confidence: 'high',
@@ -96,7 +96,7 @@ const validHandoff = {
 
 const validReview = {
   shape: 'review',
-  version: '0.1.0',
+  version: '0.1.2',
   producer: 'reviewer-1',
   payload: {
     findings: []
@@ -114,7 +114,7 @@ expectExit('demo complete', 0, ['lint', ...demoFiles]);
 expectExit('malformed json', 2, ['lint', writeText('malformed.json', '{"shape":')]);
 expectExit('unknown shape', 3, ['lint', writeJson('unknown-shape.json', {
   shape: 'unknown',
-  version: '0.1.0',
+  version: '0.1.2',
   producer: 'worker-1',
   payload: {}
 })]);
@@ -125,7 +125,7 @@ expectExit('prose shape still requires envelope', 1, ['lint', '--allow-prose-sha
   shape: 'review'
 })]);
 expectExit('missing shape is validation error', 1, ['lint', writeJson('missing-shape.json', {
-  version: '0.1.0',
+  version: '0.1.2',
   producer: 'worker-1',
   payload: {}
 })]);
@@ -151,7 +151,7 @@ expectExit('future contract version rejected', 1, ['lint', writeJson('version-fu
 expectExit('shape mismatch rejected', 1, ['lint', '--shape', 'status', writeJson('shape-mismatch.json', validHandoff)]);
 expectExit('debug next_action invalid', 1, ['lint', writeJson('debug-next-action-bad.json', {
   shape: 'debug',
-  version: '0.1.0',
+  version: '0.1.2',
   producer: 'worker-1',
   payload: {
     hypothesis: 'dependency install failed',

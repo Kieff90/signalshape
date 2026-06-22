@@ -32,7 +32,7 @@ parsing prose:
 ```json
 {
   "shape": "debug",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementer",
   "consumer_hint": "orchestrator",
   "payload": {
@@ -51,7 +51,7 @@ parsing prose:
 ```json
 {
   "shape": "debug",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementer",
   "consumer_hint": "orchestrator",
   "confidence": "low",
@@ -76,7 +76,7 @@ parsing prose:
 ```json
 {
   "shape": "debug",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "verifier",
   "payload": {
     "hypothesis": "test suite reveals data loss in the migration; rollback unsafe at this point",
@@ -94,7 +94,7 @@ parsing prose:
 ```json
 {
   "shape": "debug",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementer",
   "payload": {
     "hypothesis": "intermittent test failure suggests race condition in the cache invalidation logic",

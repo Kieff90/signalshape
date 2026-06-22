@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SignalShape CLI v0.1
+// SignalShape CLI v0.1.2
 //
 // Validates SignalShape messages against their schemas.
 // Exit codes:
@@ -133,11 +133,11 @@ function lintOne(filepath, opts) {
 
   if (PROSE_SHAPES.includes(declaredShape)) {
     if (opts.allowProseShapes) {
-      process.stdout.write(`${label}: shape "${declaredShape}" recognized but not machine-validatable in v0.1 (allowed)\n`);
+      process.stdout.write(`${label}: shape "${declaredShape}" recognized but not machine-validatable in v0.1.2 (allowed)\n`);
       return 0;
     }
     process.stderr.write(
-      `${label}: shape "${declaredShape}" is recognized but not machine-validatable in v0.1. Use --allow-prose-shapes to exit 0.\n`
+      `${label}: shape "${declaredShape}" is recognized but not machine-validatable in v0.1.2. Use --allow-prose-shapes to exit 0.\n`
     );
     return 4;
   }
@@ -175,7 +175,7 @@ Flags (lint):
   --shape <name>          Require envelope.shape to equal <name>. Does NOT bypass
                           envelope validation. Mismatch = exit 1.
   --allow-prose-shapes    For shapes recognized but not machine-validatable
-                          in v0.1 (review/implement/explain/writing), exit 0
+                          in v0.1.2 (review/implement/explain/writing), exit 0
                           instead of 4.
 
 Exit codes:

@@ -20,7 +20,7 @@ Then decide who will consume the output:
 - If another agent, orchestrator, worker, or verifier may consume it, prefer machine-validatable JSON.
 - If a human is the only consumer, prose is fine.
 
-Machine-validatable JSON shapes in v0.1:
+Machine-validatable JSON shapes in v0.1.2:
 
 - `decision`: routing or strategic choice.
 - `status`: in-flight progress while keeping ownership.
@@ -32,7 +32,7 @@ Use this envelope for machine-validatable messages:
 ```json
 {
   "shape": "decision|status|debug|handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "kebab-case-agent-id",
   "consumer_hint": "orchestrator|worker|verifier|human",
   "confidence": "high|medium|low",

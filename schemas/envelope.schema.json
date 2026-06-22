@@ -19,12 +19,12 @@
         "explain",
         "writing"
       ],
-      "description": "Message shape. Only handoff/status/decision/debug are machine-validatable in v0.1."
+      "description": "Message shape. Only handoff/status/decision/debug are machine-validatable in v0.1.2."
     },
     "version": {
       "type": "string",
-      "const": "0.1.0",
-      "description": "SignalShape contract version. v0.1 accepts 0.1.0."
+      "const": "0.1.2",
+      "description": "SignalShape contract version. v0.1.2 accepts 0.1.2."
     },
     "producer": {
       "type": "string",

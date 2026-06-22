@@ -3,12 +3,15 @@
 A lightweight communication contract for AI agents.
 
 SignalShape defines response shapes that **humans can read** and **other agents
-can validate, consume, and hand off**. v0.1 ships four machine-validatable
+can validate, consume, and hand off**. v0.1.2 ships four machine-validatable
 shapes — Handoff, Status, Decision, Debug — plus a CLI validator and a worked
 multi-agent demo.
 
 SignalShape makes agent outputs testable: key messages can be validated with
 deterministic checks instead of judged only by humans or LLMs.
+
+Current MVP version: **0.1.2**. The package, CLI, docs, schemas, examples, and
+SignalShape JSON envelope all use `0.1.2`.
 
 [![ci](https://github.com/Kieff90/signalshape/actions/workflows/ci.yml/badge.svg)](https://github.com/Kieff90/signalshape/actions/workflows/ci.yml)
 
@@ -20,7 +23,7 @@ The earlier version of SignalShape was a *style skill*: it taught agents to
 write tighter prose for humans. Useful, but it competed with every other
 "write better" prompt out there.
 
-v0.1 changes category. SignalShape is now a *communication contract*: the four
+This release changes category. SignalShape is now a *communication contract*: the four
 machine-validatable shapes carry an explicit envelope (`shape`, `version`,
 `producer`, `payload`, …) so an orchestrator can route on them without parsing
 prose.
@@ -37,7 +40,7 @@ headline — they are a side effect of the contract being well-shaped.
 
 ---
 
-## What's in v0.1
+## What's in v0.1.2
 
 - **4 JSON schemas** in [`schemas/`](schemas) — Handoff, Status, Decision, Debug
 - **Field-by-field specs** in [`spec/`](spec) including the envelope and the breaking-change policy
@@ -72,7 +75,7 @@ Use the schemas in [`schemas/`](schemas) and validate messages with:
 ./bin/signalshape lint output.json
 ```
 
-Use this when one agent's output becomes another agent's input. This is the core v0.1 use case.
+Use this when one agent's output becomes another agent's input. This is the core v0.1.2 use case.
 
 It also gives you a deterministic evaluation target: CI, workflow engines, or
 orchestrators can fail malformed messages before another agent consumes them.
@@ -133,7 +136,7 @@ The honest answer:
 | `humanizer` | Strips AI tells from prose | No machine contract |
 | `caveman` | Compresses tokens | No structure for downstream agents |
 | Generic structured prompting | One-off prompt schemas per task | No shared contract across agents |
-| **SignalShape v0.1** | Versioned contract with validator + deterministic checks across 4 shapes | Not a transport, not an SDK, not a full multi-agent protocol |
+| **SignalShape v0.1.2** | Versioned contract with validator + deterministic checks across 4 shapes | Not a transport, not an SDK, not a full multi-agent protocol |
 
 If your agent only talks to humans, those tools probably cover you.
 If your agent's output is **consumed by another agent**, SignalShape gives you
@@ -148,21 +151,20 @@ Concrete answer to "what breaks if I remove SignalShape?":
 
 ## Shape summary
 
-| Shape | Use when | Consumed by | Machine-validated in v0.1 |
+| Shape | Use when | Consumed by | Machine-validated in v0.1.2 |
 |---|---|---|---|
 | `handoff` | One agent disconnects, another continues | Receiving agent | ✓ |
 | `status` | Producer continues, reports progress | Orchestrator | ✓ |
 | `decision` | Routing or strategic choice between options | Orchestrator (routing) | ✓ |
 | `debug` | Failure with `next_action` for branching | Orchestrator (error path) | ✓ |
-| `review` | PR / code review findings | Human or downstream | (prose only in v0.1) |
-| `implement` | Plan / patch / verify | Human or verifier | (prose only in v0.1) |
-| `explain` | Concept / example / tradeoff | Human | (prose only in v0.1) |
-| `writing` | Public-facing copy with anti-slop pass | Human | (prose only in v0.1) |
+| `review` | PR / code review findings | Human or downstream | (prose only in v0.1.2) |
+| `implement` | Plan / patch / verify | Human or verifier | (prose only in v0.1.2) |
+| `explain` | Concept / example / tradeoff | Human | (prose only in v0.1.2) |
+| `writing` | Public-facing copy with anti-slop pass | Human | (prose only in v0.1.2) |
 
-The selection criterion for v0.1: each machine-validatable shape is consumed by
-**another agent** in real orchestration loops. Review and Implement are
-typically read by humans or end the chain — they can wait for v0.2 when we
-have data on how teams use them.
+The selection criterion for v0.1.2: each machine-validatable shape is consumed by
+**another agent** in real orchestration loops. Review and Implement remain
+prose-only in this MVP.
 
 ---
 
@@ -234,7 +236,7 @@ Exit codes:
 | `1` | Invalid (validation failed) |
 | `2` | Malformed JSON |
 | `3` | Unknown shape |
-| `4` | Recognized but not machine-validatable in v0.1 |
+| `4` | Recognized but not machine-validatable in v0.1.2 |
 | `64` | Usage error |
 
 Default is **strict**. CI workflows will fail on code 4 unless you opt in to
@@ -242,21 +244,9 @@ Default is **strict**. CI workflows will fail on code 4 unless you opt in to
 
 ---
 
-## Roadmap to v0.2 (deliberately not in v0.1)
-
-- Schemas for `review` and `implement` (require domain modeling)
-- npm package distribution
-- Hooks or adapters for popular agent runners so the harness enforces shape, not the agent's memory
-- A2A / MCP compatibility analysis
-- Numeric `confidence` (only after we have data on how it's actually used)
-- `correlation_id` for multi-agent tracing
-- Empirical token-saving benchmarks
-
----
-
 ## Non-goals
 
-SignalShape v0.1 is **not**:
+SignalShape v0.1.2 is **not**:
 
 - A full multi-agent protocol (no transport, no discovery, no auth)
 - An SDK or runtime — just schemas and a validator
@@ -270,13 +260,12 @@ Long answers are still allowed when they earn their length.
 
 ## Contributing
 
-The interesting failure mode of SignalShape v0.1 is "the demo workflow doesn't
+The interesting failure mode of SignalShape v0.1.2 is "the demo workflow doesn't
 read clearly with these four shapes." If that happens, the schemas need
 refining, not the demo bending around them.
 
 If you find a real multi-agent workflow that the four shapes can't express
-cleanly, open an issue with the message sequence — that's the highest-signal
-feedback for v0.2 design.
+cleanly, open an issue with the message sequence and the validator output.
 
 ---
 

@@ -13,10 +13,10 @@ SignalShape gives the agent the right response shape before it speaks.
 
 There are two modes:
 
-1. **Machine-validatable shapes (v0.1):** `handoff`, `status`, `decision`, `debug`.
+1. **Machine-validatable shapes (v0.1.2):** `handoff`, `status`, `decision`, `debug`.
    When emitting these for another agent, output JSON conforming to the schema.
 2. **Prose shapes:** `review`, `implement`, `explain`, `writing`. Use prose forms
-   (templates below). v0.1 does not constrain these as JSON.
+   (templates below). v0.1.2 does not constrain these as JSON.
 
 Rule of thumb: **if your output may be consumed by another agent, prefer JSON.**
 Humans can read JSON. Agents struggle with prose.
@@ -33,7 +33,7 @@ Before answering, silently decide:
 
 Expose this pass only when it helps the user.
 
-## Machine-validatable shapes (v0.1)
+## Machine-validatable shapes (v0.1.2)
 
 For these four shapes, when output is consumed by another agent, emit JSON
 matching the schema in `schemas/<shape>.schema.json`. Wrap every payload in the
@@ -42,7 +42,7 @@ matching the schema in `schemas/<shape>.schema.json`. Wrap every payload in the
 ```json
 {
   "shape": "<shape-name>",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "<your-agent-id>",
   "consumer_hint": "<orchestrator|worker|verifier|human>",
   "confidence": "<high|medium|low>",
@@ -128,7 +128,7 @@ The orchestrator branches on it.
 > **Handoff** = "I disconnect, someone else continues." Ownership transfers.
 > About to keep working? Status. About to stop? Handoff.
 
-## Prose shapes (still v0.1, not machine-validated)
+## Prose shapes (still v0.1.2, not machine-validated)
 
 For human-facing output, the original prose shapes still apply:
 

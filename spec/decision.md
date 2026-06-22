@@ -27,7 +27,7 @@ branch to take, or which tool to invoke.
 ```json
 {
   "shape": "decision",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "orchestrator",
   "consumer_hint": "worker",
   "confidence": "high",
@@ -48,7 +48,7 @@ branch to take, or which tool to invoke.
 ```json
 {
   "shape": "decision",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "architect-agent",
   "confidence": "medium",
   "requires_human": true,

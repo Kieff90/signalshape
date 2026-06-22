@@ -42,7 +42,7 @@
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "url": "https://github.com/Kieff90/signalshape",
     "downloadUrl": "https://github.com/Kieff90/signalshape",
-    "softwareVersion": "0.1.1",
+    "softwareVersion": "0.1.2",
     "license": "https://opensource.org/licenses/MIT"
   }
   </script>
@@ -66,7 +66,7 @@
           "name": "How is SignalShape different from generic structured prompting?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Generic structured prompting defines ad-hoc schemas per task with no shared contract across agents, no versioning, and no validator. SignalShape provides a versioned contract (v0.1.0) with a CLI validator that enforces format compliance deterministically across producer/consumer pairs. The signalshape lint command exits non-zero on schema violations — CI-ready without writing validation logic."
+            "text": "Generic structured prompting defines ad-hoc schemas per task with no shared contract across agents, no versioning, and no validator. SignalShape provides a versioned contract (v0.1.2) with a CLI validator that enforces format compliance deterministically across producer/consumer pairs. The signalshape lint command exits non-zero on schema violations — CI-ready without writing validation logic."
           }
         },
         {
@@ -83,14 +83,6 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Run: ./bin/signalshape lint output.json. Exit code 0 = valid. Exit code 1 = schema violation. Exit code 2 = malformed JSON. Also works from stdin: cat output.json | ./bin/signalshape lint -. The validator uses ajv with JSON Schema draft-2020-12 and supports batch validation with highest-exit-code-wins semantics."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is planned for SignalShape v0.2?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Planned for v0.2: schemas for review and implement shapes, npm package distribution, Hooks or adapters for popular agent runners with harness-level enforcement, A2A and MCP compatibility analysis, correlation_id for multi-agent tracing, and empirical token-saving benchmarks. These are deliberately out of v0.1 scope."
           }
         }
       ]
@@ -967,9 +959,9 @@
     <div class="hero-grid">
 
       <div class="reveal">
-        <div class="hero-badge" aria-label="Version 0.1.1, MIT license">
+        <div class="hero-badge" aria-label="Version 0.1.2, MIT license">
           <span class="hero-badge-dot" aria-hidden="true"></span>
-          <span>v0.1.1 — MIT</span>
+          <span>v0.1.2 — MIT</span>
         </div>
         <h1 id="hero-heading">Agent outputs that<br><span class="hl">survive the handoff.</span></h1>
         <p class="hero-sub">
@@ -1350,7 +1342,7 @@
             <td>No shared contract across producers. No versioning. No validator.</td>
           </tr>
           <tr class="hl">
-            <td>SignalShape v0.1</td>
+            <td>SignalShape v0.1.2</td>
             <td>Versioned contract, 4 JSON schemas, CLI validator, worked multi-agent demo</td>
             <td>Not a transport. Not an SDK. Not a full multi-agent protocol.</td>
           </tr>
@@ -1443,7 +1435,7 @@
         </button>
         <div class="faq-a" role="region" aria-hidden="true">
           <div class="faq-a-inner">
-            Structured prompting defines ad-hoc schemas per task — no shared contract across agents, no versioning, no validator. SignalShape is versioned (<code>v0.1.0</code>) and shared: <code>signalshape lint</code> enforces compliance deterministically across all producers and consumers in a pipeline.
+            Structured prompting defines ad-hoc schemas per task — no shared contract across agents, no versioning, no validator. SignalShape is versioned (<code>v0.1.2</code>) and shared: <code>signalshape lint</code> enforces compliance deterministically across all producers and consumers in a pipeline.
           </div>
         </div>
       </div>
@@ -1469,17 +1461,6 @@
           </div>
         </div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q" type="button" aria-expanded="false">
-          What's planned for v0.2?
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="faq-a" role="region" aria-hidden="true">
-          <div class="faq-a-inner">
-            Schemas for <code>review</code> and <code>implement</code>, npm package distribution, Hooks or adapters for popular agent runners with harness-level enforcement, A2A and MCP compatibility analysis, <code>correlation_id</code> for multi-agent tracing, and empirical token-saving benchmarks. Deliberately out of v0.1 scope.
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -1494,7 +1475,7 @@
         <span class="foot-dot" aria-hidden="true"></span>
         SignalShape
       </a>
-      <span class="foot-meta">v0.1.1 · MIT License · Built for multi-agent pipelines</span>
+      <span class="foot-meta">v0.1.2 · MIT License · Built for multi-agent pipelines</span>
       <nav class="foot-links" aria-label="Footer navigation">
         <a href="https://github.com/Kieff90/signalshape" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://github.com/Kieff90/signalshape/tree/main/spec" target="_blank" rel="noopener noreferrer">Spec</a>
@@ -1509,7 +1490,7 @@
 /* ── JSON shape data ─────────────────────────────────── */
 const SHAPES = {
   handoff: {
-    shape:"handoff",version:"0.1.0",producer:"implementation-worker",
+    shape:"handoff",version:"0.1.2",producer:"implementation-worker",
     consumer_hint:"verifier",confidence:"high",requires_human:false,
     payload:{
       goal:"validate the auth refactor",
@@ -1523,7 +1504,7 @@ const SHAPES = {
     }
   },
   status:{
-    shape:"status",version:"0.1.0",producer:"worker-1",consumer_hint:"orchestrator",
+    shape:"status",version:"0.1.2",producer:"worker-1",consumer_hint:"orchestrator",
     payload:{
       done:["read repo","wrote unit tests"],
       current:"implementing auth refactor",
@@ -1532,7 +1513,7 @@ const SHAPES = {
     }
   },
   decision:{
-    shape:"decision",version:"0.1.0",producer:"orchestrator",
+    shape:"decision",version:"0.1.2",producer:"orchestrator",
     consumer_hint:"worker",confidence:"high",
     payload:{
       recommendation:"spawn implementation-worker",
@@ -1545,7 +1526,7 @@ const SHAPES = {
     }
   },
   debug:{
-    shape:"debug",version:"0.1.0",producer:"worker-1",
+    shape:"debug",version:"0.1.2",producer:"worker-1",
     consumer_hint:"orchestrator",confidence:"low",requires_human:true,
     payload:{
       hypothesis:"JWT secret missing from environment on staging",
@@ -1560,7 +1541,7 @@ const SHAPES = {
 };
 
 const HERO_JSON = {
-  shape:"handoff",version:"0.1.0",producer:"impl-worker",
+  shape:"handoff",version:"0.1.2",producer:"impl-worker",
   consumer_hint:"verifier",confidence:"high",
   payload:{
     goal:"validate auth refactor",

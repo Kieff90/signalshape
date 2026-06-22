@@ -1,6 +1,6 @@
 {
   "shape": "handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementation-worker",
   "consumer_hint": "verifier",
   "confidence": "high",

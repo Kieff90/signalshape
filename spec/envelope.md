@@ -1,4 +1,4 @@
-# SignalShape Envelope (v0.1)
+# SignalShape Envelope (v0.1.2)
 
 The envelope is the outer wrapper every SignalShape message carries.
 It identifies the message **shape**, the contract **version**, and the **producer** —
@@ -13,7 +13,7 @@ Every machine-validatable shape (Handoff, Status, Decision, Debug) inlines this 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `shape` | enum string | yes | One of: `handoff`, `status`, `decision`, `debug`, `review`, `implement`, `explain`, `writing` |
-| `version` | string literal | yes | SignalShape contract version. v0.1 accepts only `"0.1.0"` |
+| `version` | string literal | yes | SignalShape contract version. v0.1.2 accepts only `"0.1.2"` |
 | `producer` | string | yes | `^[a-z][a-z0-9-]*$`, length 1–80 |
 | `consumer_hint` | enum string | no | One of: `orchestrator`, `worker`, `verifier`, `human` |
 | `confidence` | enum string | no | One of: `high`, `medium`, `low` |
@@ -30,15 +30,15 @@ Every machine-validatable shape (Handoff, Status, Decision, Debug) inlines this 
 
 The kind of message. Validators dispatch on this. The 8 enum values reflect SignalShape's full
 shape catalog. Only the first 4 (`handoff`, `status`, `decision`, `debug`) are
-machine-validatable in v0.1. The other 4 are valid envelope values but their `payload`
-is not constrained in v0.1.
+machine-validatable in v0.1.2. The other 4 are valid envelope values but their `payload`
+is not constrained in v0.1.2.
 
 ### `version`
 
 `version` identifies the **SignalShape contract version** used by the producer.
 This is the contract version, **not** the version of an individual shape schema.
-The v0.1 validator accepts only `"0.1.0"` so consumers do not accidentally treat
-future incompatible contracts as valid v0.1 messages.
+The v0.1.2 validator accepts only `"0.1.2"` so consumers do not accidentally treat
+newer incompatible contracts as valid v0.1.2 messages.
 
 > Shape schemas may evolve internally, but breaking validation semantics
 > require a contract version bump.
@@ -99,7 +99,7 @@ all useful context up front. Everything else is locked.
 
 ## Breaking-change policy
 
-What requires a contract version bump (e.g., `0.1.0 → 0.2.0`):
+What requires a contract version bump:
 
 | Change | Breaking? |
 |---|---|
@@ -125,7 +125,7 @@ as a *consumer choice*, not a producer concern.
 ```json
 {
   "shape": "status",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "worker-1",
   "payload": {
     "done": ["read repo"],
@@ -141,7 +141,7 @@ as a *consumer choice*, not a producer concern.
 ```json
 {
   "shape": "handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "implementation-worker",
   "consumer_hint": "verifier",
   "confidence": "high",

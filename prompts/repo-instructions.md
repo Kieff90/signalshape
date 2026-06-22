@@ -20,7 +20,7 @@ Every JSON message must use this envelope:
 ```json
 {
   "shape": "decision|status|debug|handoff",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "producer": "kebab-case-agent-id",
   "consumer_hint": "orchestrator|worker|verifier|human",
   "confidence": "high|medium|low",
