@@ -109,8 +109,8 @@
     ],
     "risks": [
       {
-        "risk": "run-demo.sh temporarily mutates math.js in place to replay the bug; an interrupt between revert and restore leaves the working tree in the buggy state",
-        "mitigation": "run-demo.sh uses a bash trap to guarantee restore on exit or SIGINT; verified safe"
+        "risk": "a forced termination can prevent run-demo.sh from deleting its temporary app copy",
+        "mitigation": "all replay mutations occur under mktemp outside the repository; a forced termination may leave disposable temp files but cannot change tracked math.js"
       },
       {
         "risk": "The test suite covers only integer inputs; floating-point or non-numeric arguments are untested",

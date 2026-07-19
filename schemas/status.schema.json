@@ -11,6 +11,22 @@
       "type": "object",
       "required": ["done", "current", "next"],
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "next": { "maxItems": 0 }
+            },
+            "required": ["next"]
+          },
+          "then": {
+            "required": ["blocked_by"],
+            "properties": {
+              "blocked_by": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ],
       "properties": {
         "done": {
           "type": "array",
@@ -25,7 +41,8 @@
           "items": { "type": "string", "minLength": 1 }
         },
         "blocked_by": {
-          "type": ["string", "null"]
+          "type": ["string", "null"],
+          "minLength": 1
         }
       }
     }

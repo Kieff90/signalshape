@@ -85,9 +85,9 @@ up ownership** — the producer is done. The human inherits the workflow.
 
 `decisions` records four non-trivial choices made during the workflow (why TDD,
 why fix impl not tests, why keep the zero-case, why emit SignalShape at every
-boundary). `files_touched` gives a complete audit trail. `risks` surfaces the
-in-place mutation of math.js during the demo, floating-point gaps in test
-coverage, and the demo's simplicity versus multi-file production bugs.
+boundary). `files_touched` gives a complete audit trail. `risks` surfaces
+floating-point gaps in test coverage and the demo's simplicity versus multi-file
+production bugs. Runtime mutation is isolated to a disposable temporary copy.
 
 ## Run it
 
@@ -106,10 +106,14 @@ npm run lint:demo:debug
 
 The script:
 1. Validates all four SignalShape contracts (exit 1 on any failure)
-2. Temporarily reverts `math.js` to the buggy state and confirms the test fails
-3. Restores the fix and confirms all three tests pass
+2. Copies `app/` to a temporary directory outside the repository
+3. Reverts the copied `math.js` to the buggy state and confirms the test fails
+4. Applies the fix to the copy and confirms all three tests pass
 
-Exit 0 means: contracts are valid, the failure was real, the fix works.
+Exit 0 means: contracts are valid, the failure was real, the fix works, and the
+tracked demo source was never modified. A forced termination can leave a
+disposable temporary directory, but cannot leave the repository in a buggy
+state.
 
 ## What this proves
 

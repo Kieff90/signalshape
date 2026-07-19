@@ -47,7 +47,7 @@ headline — they are a side effect of the contract being well-shaped.
 - **CLI validator** at [`bin/signalshape`](bin/signalshape) — Node + ajv, draft-2020-12
 - **Worked multi-agent demo** at [`examples/workflows/orchestrator-worker-handoff/`](examples/workflows/orchestrator-worker-handoff)
 - **Updated skill** at [`skills/signalshape/SKILL.md`](skills/signalshape/SKILL.md) — teaches JSON for the 4 contract shapes, prose for the rest
-- **CI** that lints the demo on every push
+- **CI** that tests all supported Node lines and lints both demos on pushes and pull requests targeting `main`
 
 ---
 

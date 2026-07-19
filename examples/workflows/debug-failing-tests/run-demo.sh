@@ -3,8 +3,8 @@
 #
 # Steps:
 #   1. Validate all four SignalShape contract files
-#   2. Show the bug: temporarily revert math.js to fail the test
-#   3. Show the fix: restore the correct operator and pass the test
+#   2. Copy the demo app to an isolated temporary directory
+#   3. Show the bug and fix without changing the repository checkout
 #
 # Exit 0 if everything validates and both test states are observed.
 set -euo pipefail
@@ -12,20 +12,19 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../../.." && pwd)"
 CLI="$ROOT/bin/signalshape"
-APP="$HERE/app"
+SOURCE_APP="$HERE/app"
+WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/signalshape-debug-demo.XXXXXX")"
+APP="$WORK_DIR/app"
 MATH_JS="$APP/math.js"
 
-# Guarantee math.js is restored to the fixed state on any exit (including SIGINT).
-restore_math() {
-  node -e "
-const fs = require('fs');
-const src = fs.readFileSync('${MATH_JS}', 'utf8');
-if (src.includes('return a - b')) {
-  fs.writeFileSync('${MATH_JS}', src.replace('return a - b', 'return a + b'));
+# Cleanup is best-effort. Even SIGKILL can only leave a disposable directory in
+# the system temp area because all mutations happen in this copy.
+cleanup() {
+  rm -rf "$WORK_DIR"
 }
-" 2>/dev/null || true
-}
-trap restore_math EXIT
+trap cleanup EXIT
+
+cp -R "$SOURCE_APP" "$APP"
 
 # ── 1. Validate all SignalShape contracts ─────────────────────────────────────
 
@@ -47,16 +46,16 @@ echo "── 4. verifier confirms fix and hands off to human"
 echo
 echo "✓ all four contracts validated"
 
-# ── 2. Reproduce the failing test (revert bug temporarily) ────────────────────
+# ── 2. Reproduce the failing test in the isolated copy ────────────────────────
 
 echo
-echo "── Reproducing the bug (reverting to a - b)..."
+echo "── Reproducing the bug in a temporary copy (reverting to a - b)..."
 node -e "
 const fs = require('fs');
-const file = '${APP}/math.js';
+const file = process.argv[1];
 const src = fs.readFileSync(file, 'utf8');
 fs.writeFileSync(file, src.replace('return a + b', 'return a - b'));
-"
+" "$MATH_JS"
 
 echo "── Running test with buggy math.js (expecting failures)..."
 set +e
@@ -66,13 +65,6 @@ set -e
 
 if [ "$TEST_EXIT" -eq 0 ]; then
   echo "ERROR: expected test failure but got exit 0" >&2
-  # Restore before failing
-  node -e "
-const fs = require('fs');
-const file = '${APP}/math.js';
-const src = fs.readFileSync(file, 'utf8');
-fs.writeFileSync(file, src.replace('return a - b', 'return a + b'));
-"
   exit 1
 fi
 
@@ -84,10 +76,10 @@ echo
 echo "── Applying fix (a - b → a + b)..."
 node -e "
 const fs = require('fs');
-const file = '${APP}/math.js';
+const file = process.argv[1];
 const src = fs.readFileSync(file, 'utf8');
 fs.writeFileSync(file, src.replace('return a - b', 'return a + b'));
-"
+" "$MATH_JS"
 
 echo "── Running test with fixed math.js (expecting all pass)..."
 node --test "$APP/math.test.js"

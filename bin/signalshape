@@ -177,6 +177,7 @@ Flags (lint):
   --allow-prose-shapes    For shapes recognized but not machine-validatable
                           in v0.1.2 (review/implement/explain/writing), exit 0
                           instead of 4.
+  --                      End lint options; remaining arguments are file paths.
 
 Exit codes:
   0  valid
@@ -191,10 +192,10 @@ Exit codes:
 function parseArgs(argv) {
   const args = argv.slice(2);
 
-  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
+  if (args.length === 0 || (args.length === 1 && ['--help', '-h'].includes(args[0]))) {
     return { command: 'help' };
   }
-  if (args.includes('--version') || args.includes('-v')) {
+  if (args.length === 1 && ['--version', '-v'].includes(args[0])) {
     return { command: 'version' };
   }
 
@@ -217,7 +218,10 @@ function parseArgs(argv) {
       i++;
     } else if (a === '--allow-prose-shapes') {
       opts.allowProseShapes = true;
-    } else if (a.startsWith('--')) {
+    } else if (a === '--') {
+      opts.files.push(...lintArgs.slice(i + 1));
+      break;
+    } else if (a.startsWith('-') && a !== '-') {
       return { command: 'error', message: `unknown flag: ${a}` };
     } else {
       opts.files.push(a);

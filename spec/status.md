@@ -15,10 +15,13 @@ Use during work to update an orchestrator (or human) on current state.
 |---|---|---|---|
 | `done` | array of string | yes | Tasks completed since the last status. May be empty. |
 | `current` | string | yes | What the producer is working on right now. One sentence. |
-| `next` | array of string | yes | Planned next tasks. May be empty if `blocked_by` set. |
-| `blocked_by` | string \| null | no | If non-null, work is blocked. Description of what is blocking. |
+| `next` | array of string | yes | Planned next tasks. May be empty only when `blocked_by` is a non-empty string. |
+| `blocked_by` | string \| null | no | If non-null, work is blocked. Must be a non-empty description. |
 
 `additionalProperties: false` on payload top-level.
+
+When `next` is empty, `blocked_by` is required and must contain a non-empty
+description. A status with neither a next action nor a real blocker is invalid.
 
 ## Examples
 
