@@ -46,12 +46,15 @@ function buildAjv() {
 }
 
 function readInput(arg) {
-  if (arg === '-') {
+  const fd = arg === '-' ? 0 : fs.openSync(arg, 'r');
+  try {
     const chunks = [];
     let total = 0;
     const buffer = Buffer.alloc(64 * 1024);
     let bytesRead;
-    while ((bytesRead = fs.readSync(0, buffer, 0, buffer.length, null)) > 0) {
+    // File sizes can be stale or zero for streams. Enforce the limit on actual
+    // bytes, reading at most one byte beyond it to distinguish EOF from overflow.
+    while ((bytesRead = fs.readSync(fd, buffer, 0, Math.min(buffer.length, MAX_INPUT_BYTES - total + 1), null)) > 0) {
       total += bytesRead;
       if (total > MAX_INPUT_BYTES) {
         const err = new Error(`input exceeds ${MAX_INPUT_BYTES} bytes`);
@@ -60,15 +63,10 @@ function readInput(arg) {
       }
       chunks.push(Buffer.from(buffer.subarray(0, bytesRead)));
     }
-    return Buffer.concat(chunks).toString('utf8');
+    return Buffer.concat(chunks, total).toString('utf8');
+  } finally {
+    if (arg !== '-') fs.closeSync(fd);
   }
-  const stat = fs.statSync(arg);
-  if (stat.size > MAX_INPUT_BYTES) {
-    const err = new Error(`input exceeds ${MAX_INPUT_BYTES} bytes`);
-    err.code = 'SIGNALSHAPE_INPUT_TOO_LARGE';
-    throw err;
-  }
-  return fs.readFileSync(arg, 'utf8');
 }
 
 function formatErrors(errors) {

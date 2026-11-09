@@ -5,7 +5,7 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const CLI = path.join(ROOT, 'bin', 'signalshape');
@@ -27,7 +27,8 @@ function run(args, options = {}) {
   return spawnSync(CLI, args, {
     cwd: options.cwd || ROOT,
     encoding: 'utf8',
-    input: options.input
+    input: options.input,
+    timeout: 10000
   });
 }
 
@@ -318,6 +319,56 @@ function runSuite() {
 
     expectResult('oversized file rejected', { status: 64, stderrIncludes: 'input too large' }, [
       'lint', writeText('oversized.json', ' '.repeat(1024 * 1024 + 1))
+    ]);
+
+    // Measure bytes actually read, including streams whose stat size is zero.
+    const limit = 1024 * 1024;
+    const exactLimit = JSON.stringify(validHandoff).padEnd(limit, ' ');
+    const oversized = `${exactLimit} `;
+    expectResult('file at input limit accepted', { status: 0 }, [
+      'lint', writeText('exact-limit.json', exactLimit)
+    ]);
+    expectResult('stdin at input limit accepted', { status: 0 }, ['lint', '-'], { input: exactLimit });
+    expectResult('oversized stdin rejected', { status: 64, stderrIncludes: 'input too large' }, ['lint', '-'], {
+      input: oversized
+    });
+    if (process.platform !== 'win32') {
+      const fifo = path.join(tmp, 'input.fifo');
+      const source = writeText('fifo-source.json', oversized);
+      const mkfifo = spawnSync('mkfifo', [fifo], { encoding: 'utf8' });
+      assert.strictEqual(mkfifo.status, 0, mkfifo.stderr);
+      const writer = spawn(process.execPath, ['-e',
+        "const fs = require('fs'); fs.writeFileSync(process.argv[1], fs.readFileSync(process.argv[2]));",
+        fifo, source
+      ], { stdio: 'ignore' });
+      try {
+        expectResult('oversized named pipe rejected', { status: 64, stderrIncludes: 'input too large' }, ['lint', fifo]);
+      } finally {
+        writer.kill();
+      }
+    }
+
+    const unicodeInput = JSON.stringify({
+      ...validHandoff,
+      payload: { goal: '\u00e9'.repeat(limit / 2) }
+    });
+    assert.ok(unicodeInput.length < limit);
+    assert.ok(Buffer.byteLength(unicodeInput, 'utf8') > limit);
+    expectResult('stdin limit counts UTF-8 bytes', { status: 64, stderrIncludes: 'input too large' }, ['lint', '-'], {
+      input: unicodeInput
+    });
+
+    const validFile = writeJson('batch-valid.json', validHandoff);
+    const invalidFile = writeJson('batch-invalid.json', { ...validHandoff, payload: {} });
+    const malformedFile = writeText('batch-malformed.json', '{');
+    expectResult('batch retains highest exit code', { status: 2, stdoutIncludes: 'valid \\(handoff\\)' }, [
+      'lint', malformedFile, invalidFile, validFile
+    ]);
+    expectResult('batch continues after oversized input', { status: 64, stdoutIncludes: 'valid \\(handoff\\)' }, [
+      'lint', writeText('batch-oversized.json', oversized), validFile
+    ]);
+    expectResult('missing file is usage error', { status: 64, stderrIncludes: 'cannot read file' }, [
+      'lint', path.join(tmp, 'missing.json')
     ]);
 
     const cleanupProbe = spawnSync(process.execPath, [__filename], {

@@ -226,7 +226,15 @@ cat output.json | ./bin/signalshape lint -
 
 # Multiple files (highest exit code wins)
 ./bin/signalshape lint examples/workflows/**/*.json
+
+# Treat paths starting with a dash as file names
+./bin/signalshape lint -- -output.json
 ```
+
+Each input is limited to **1 MiB (1,048,576 UTF-8 bytes)**, including files and
+stdin. Inputs exactly at the limit are accepted. Unreadable files and inputs
+over the limit return exit code `64`; batch validation continues with the
+remaining files.
 
 Exit codes:
 
@@ -259,6 +267,15 @@ Long answers are still allowed when they earn their length.
 ---
 
 ## Contributing
+
+Run the regression suite and both worked demos before submitting a change:
+
+```sh
+npm ci
+npm test
+npm run lint:demo
+npm run lint:demo:debug
+```
 
 The interesting failure mode of SignalShape v0.1.2 is "the demo workflow doesn't
 read clearly with these four shapes." If that happens, the schemas need
